@@ -42,13 +42,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ILotteryFactory.cs" />
+    <Compile Include="LotteryInfo\EntityHelper.cs" />
     <Compile Include="LotteryInfo\LotteryQXC.cs" />
+    <Compile Include="LotteryOriginData.cs" />
     <Compile Include="UtilsTools\JsonHelper.cs" />
     <Compile Include="LotteryBasicInfo.cs" />
     <Compile Include="LotteryInfo\LotteryDLT.cs" />
     <Compile Include="LotterySerialNo.cs" />
     <Compile Include="LotteryInfo\LotterySSQ.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UtilsTools\NetHelper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
