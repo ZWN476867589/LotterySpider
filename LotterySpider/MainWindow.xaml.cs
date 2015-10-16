@@ -11,6 +11,7 @@ using LotterySpider;
 using LotterySpider.Business;
 using LotterySpider.DataBase;
 using LotterySpider.Business.LotteryInfo;
+using LotterySpider.Business.UtilsTools;
 
 namespace LotterySpider
 {
@@ -49,14 +50,14 @@ namespace LotterySpider
             string sqlStr = "select * from lotterybasicinfo";
             SQLiteDataReader reader = DBHelper.Query(sqlStr);
             while (reader.Read())
-            {                
+            {
                 LotteryBasicInfo info = new LotteryBasicInfo()
                 {
                     LotteryID = reader.GetInt32(0),
                     LotteryTypeID = reader.GetInt32(1),
                     LotteryName = reader.GetString(2),
                     LotteryShortCode = reader.GetString(3),
-                    StartSellTime = reader.GetString(5),                      
+                    StartSellTime = reader.GetString(5),
                 };
                 info.SetOpenTimeOfWeek(reader.GetString(4));
                 infos.Add(info);
@@ -72,12 +73,53 @@ namespace LotterySpider
                 MessageBox.Show("请选择彩票.");
                 return;
             }
-            CreateLotterySerialNo();
-        }        
-        public void CreateLotterySerialNo()
-        {            
+            GetLotteryOriginData();
+        }
+        public void GetLotteryOriginData()
+        {
             string LotteryID = cmbLotteryName.SelectedValue.ToString();
-            LotteryBasicInfo info = infos.FirstOrDefault(p => p.LotteryTypeID.ToString() == LotteryID);            
+            LotteryBasicInfo info = infos.FirstOrDefault(p => p.LotteryTypeID.ToString() == LotteryID);
+            if (info != null)
+            {
+                string baseUrl = @"http://baidu.lecai.com/lottery/draw/ajax_get_detail.php?lottery_type={0}&phase={1}";
+                SQLiteDataReader Reader = DBHelper.Query("select * from LotterySerialNo where lotterytypeid = " + info.LotteryTypeID);
+                List<LotterySerialNo> numList = new List<LotterySerialNo>();
+                List<LotteryOriginData> dataList = new List<LotteryOriginData>();
+                while (Reader.Read())
+                {
+                    LotterySerialNo num = new LotterySerialNo()
+                    {
+                        RowID = Reader.GetInt32(0),
+                        SerailNo = Reader.GetString(1),
+                        LotteryTypeID = Reader.GetInt32(2),
+                        OpenTime = Reader.GetString(3),
+                    };
+                    numList.Add(num);
+                }
+                foreach (var num in numList)
+                {
+                    string url = String.Format(baseUrl, num.LotteryTypeID, num.SerailNo);
+                    string res = NetHelper.GetByUrl(url);
+                    if (!String.IsNullOrWhiteSpace(res))
+                    {
+                        LotteryOriginData data = new LotteryOriginData()
+                        {
+                            LotteryTypeID = num.LotteryTypeID,
+                            OriginData = res,
+                            DataUrl = url,
+                            Time = num.OpenTime,
+                            SerialNo = num.SerailNo,
+                        };
+                        dataList.Add(data);
+                    }
+                }
+                InsertLotteryOriginDataList(dataList);
+            }
+        }
+        public void CreateLotterySerialNo()
+        {
+            string LotteryID = cmbLotteryName.SelectedValue.ToString();
+            LotteryBasicInfo info = infos.FirstOrDefault(p => p.LotteryTypeID.ToString() == LotteryID);
             if (info != null)
             {
                 switch (info.LotteryShortCode)
@@ -130,6 +172,82 @@ namespace LotterySpider
                 }
                 tran.Commit();
             }
+        }
+        public void InsertLotteryOriginDataList(List<LotteryOriginData> dataList)
+        {
+            using (SQLiteTransaction tran = DBHelper.SQLConn.BeginTransaction())
+            {
+                foreach (var i in dataList)
+                {
+                    SQLiteCommand cmd = new SQLiteCommand(DBHelper.SQLConn);
+                    cmd.Transaction = tran;
+                    cmd.CommandText = "insert into LotteryOriginData values(@RowID,@LotteryTypeID,@OriginData,@DataUrl,@Time,@SerialNo)";
+                    cmd.Parameters.AddRange(new[]{
+                    new SQLiteParameter("@RowID",null),
+                    new SQLiteParameter("@LotteryTypeID",i.LotteryTypeID),
+                    new SQLiteParameter("@OriginData",i.OriginData),
+                    new SQLiteParameter("@DataUrl",i.DataUrl),
+                    new SQLiteParameter("@Time",i.Time),
+                    new SQLiteParameter("@SerialNo",i.SerialNo),
+                    });
+                    cmd.ExecuteNonQuery();
+                }
+                tran.Commit();
+            }
+        }
+        private void btnCreateSerialNo_Click(object sender, RoutedEventArgs e)
+        {
+            if (cmbLotteryName.SelectedIndex == -1)
+            {
+                MessageBox.Show("请选择彩票.");
+                return;
+            }
+            CreateLotterySerialNo();
+        }
+
+        private void btnAnalyseData_Click(object sender, RoutedEventArgs e)
+        {
+            if (cmbLotteryName.SelectedIndex == -1)
+            {
+                MessageBox.Show("请选择彩票.");
+                return;
+            }
+            AnslyseLotteryData();
+        }
+        public void AnslyseLotteryData()
+        {
+            string LotteryID = cmbLotteryName.SelectedValue.ToString();
+            LotteryBasicInfo info = infos.FirstOrDefault(p => p.LotteryTypeID.ToString() == LotteryID);
+            if (info != null)
+            {
+                List<LotteryOriginData> dataList = new List<LotteryOriginData>();
+                dataList = LoadLotteryOriginData(info,dataList);
+                switch (info.LotteryShortCode)
+                {
+                    case "SSQ":
+                        LotterySSQ SSQ = new LotterySSQ();
+                        SSQ.AnalyseOriginData(dataList);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        public List<LotteryOriginData> LoadLotteryOriginData(LotteryBasicInfo info, List<LotteryOriginData> dataList)
+        {
+            SQLiteDataReader Reader = DBHelper.Query("select * from LotteryOriginData where lotterytypeid = " + info.LotteryTypeID);
+            while (Reader.Read())
+            {
+                LotteryOriginData data = new LotteryOriginData() { 
+                RowID = Reader.GetInt32(0),
+                LotteryTypeID = Reader.GetInt32(1),
+                OriginData= Reader.GetString(2),
+                DataUrl = Reader.GetString(3),
+                Time = Reader.GetString(4),
+                };
+                dataList.Add(data);
+            }
+            return dataList;
         }
     }
 }

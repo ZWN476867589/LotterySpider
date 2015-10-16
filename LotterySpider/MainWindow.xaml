@@ -9,9 +9,11 @@
         <TabControl Height="311" HorizontalAlignment="Left" Name="TC1" VerticalAlignment="Top" Width="503">
             <TabItem Header="彩票信息采集" Name="TISSQ">
                 <Grid>
-                    <Button Content="开始采集" Height="23" HorizontalAlignment="Left" Margin="6,44,0,0" Name="btnStart" VerticalAlignment="Top" Width="75" Click="btnStart_Click" />
+                    <Button Content="开始采集" Height="23" HorizontalAlignment="Left" Margin="118,61,0,0" Name="btnStart" VerticalAlignment="Top" Width="75" Click="btnStart_Click" />
                     <ComboBox Height="23" HorizontalAlignment="Left" Margin="73,10,0,0" Name="cmbLotteryName" VerticalAlignment="Top" Width="120" />
                     <Label Content="彩票名称:" Height="28" HorizontalAlignment="Left" Margin="6,10,0,0" Name="label1" VerticalAlignment="Top" />
+                    <Button Content="生成序列号" Height="23" HorizontalAlignment="Left" Margin="15,61,0,0" Name="btnCreateSerialNo" VerticalAlignment="Top" Width="75" Click="btnCreateSerialNo_Click" />
+                    <Button Content="分析数据" Height="23" HorizontalAlignment="Left" Margin="214,61,0,0" Name="btnAnalyseData" VerticalAlignment="Top" Width="75" Click="btnAnalyseData_Click" />
                 </Grid>
             </TabItem>
         </TabControl>
