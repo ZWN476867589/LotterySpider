@@ -53,7 +53,22 @@ namespace LotterySpider.Business
         /// <summary>
         /// 彩票开售时间,主要指能在百度乐彩网站上能查到记录的最早时间
         /// </summary>
-        public string StartSellTime
+        public string StartSaleTime
+        {
+            get;
+            set;
+        }
+        public string StartSerialNo
+        {
+            get;
+            set;
+        }
+        public string SerialNoType
+        {
+            get;
+            set;
+        }
+        public int SerialNoStartIndex
         {
             get;
             set;

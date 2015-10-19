@@ -10,7 +10,7 @@ namespace LotterySpider.Business.LotteryInfo
         public List<LotterySerialNo> CreateSerialNo(LotteryBasicInfo info)
         {
             List<LotterySerialNo> serialNos = new List<LotterySerialNo>();
-            DateTime startTime = string.IsNullOrEmpty(info.StartSellTime) ? DateTime.Parse("2007-05-30 20:30:00") : DateTime.Parse(info.StartSellTime);
+            DateTime startTime = string.IsNullOrEmpty(info.StartSaleTime) ? DateTime.Parse("2007-05-30 20:30:00") : DateTime.Parse(info.StartSaleTime);
             int i = 0;
             for (DateTime time = startTime; time < DateTime.Now; time = time.AddDays(1))
             {

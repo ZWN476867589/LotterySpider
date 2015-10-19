@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Collections;
 
 namespace LotterySpider.Business.LotteryInfo
 {
@@ -10,7 +11,7 @@ namespace LotterySpider.Business.LotteryInfo
         public List<LotterySerialNo> CreateSerialNo(LotteryBasicInfo info)
         {
             List<LotterySerialNo> serialNos = new List<LotterySerialNo>();
-            DateTime startTime = string.IsNullOrEmpty(info.StartSellTime) ? DateTime.Parse("2003-02-23 09:15:00") : DateTime.Parse(info.StartSellTime);
+            DateTime startTime = string.IsNullOrEmpty(info.StartSaleTime) ? DateTime.Parse("2003-02-23 09:15:00") : DateTime.Parse(info.StartSaleTime);
             int i = 0;
             for (DateTime time = startTime; time < DateTime.Now; time = time.AddDays(1))
             {
@@ -38,13 +39,20 @@ namespace LotterySpider.Business.LotteryInfo
             foreach (var originData in originDataList)
             {
                 Dictionary<string, object> dataDict = JsonHelper.JsonToDictionary(originData.OriginData);
+                Dictionary<int, int> redDict = new Dictionary<int, int>();
+                Dictionary<int, int> blueDict = new Dictionary<int, int>();
                 if (dataDict != null)
                 {
                     LotterySSQBaseInfo SSQInfo = new LotterySSQBaseInfo();
                     EntityHelper.setPropertiseValue<LotterySSQBaseInfo>(dataDict,SSQInfo);
                     LotterySSQDetailInfo SSQDetailInfo = new LotterySSQDetailInfo();
                     EntityHelper.setPropertiseValue<LotterySSQDetailInfo>(SSQInfo.data,SSQDetailInfo);
-                    string m = SSQDetailInfo.phasetype.ToString();
+                    ArrayList result = (ArrayList)SSQDetailInfo.result["result"];
+                    foreach (Dictionary<string,object> i in result)
+                    {
+                        string ballColor = i["key"].ToString();
+                        ArrayList data = (ArrayList)i["data"];
+                    }
                 }
             }
         }
@@ -90,5 +98,9 @@ namespace LotterySpider.Business.LotteryInfo
         public string time_exchange { get; set; }
         public string formatSaleAmount { get; set; }
         public string latest_pool_amount_str { get; set; }
+    }
+    public class LotteryPrizeInfo
+    {
+
     }
 }
