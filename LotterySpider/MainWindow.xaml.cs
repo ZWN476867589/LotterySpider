@@ -11,7 +11,7 @@ using LotterySpider;
 using LotterySpider.Business;
 using LotterySpider.DataBase;
 using LotterySpider.Business.LotteryInfo;
-using LotterySpider.Business.UtilsTools;
+using LotterySpider.Business.UtilTools;
 
 namespace LotterySpider
 {
@@ -101,7 +101,7 @@ namespace LotterySpider
                         dataList.Add(data);
                     }
                 }
-                InsertLotteryOriginDataList(dataList);
+               LotteryDataUtils.InsertLotteryOriginDataListToDB(dataList);
             }
         }
         public void CreateLotterySerialNo()
@@ -132,66 +132,9 @@ namespace LotterySpider
                         i += 1;
                     }
                 }
-                InsertLotterySerialNoList(serialNos);
+                LotteryDataUtils.InsertLotterySerialNoListToDB(serialNos);
             }
-        }
-        public void CreateSSQSerialNo(LotteryBasicInfo info)
-        {
-            LotterySSQ SSQ = new LotterySSQ();
-            InsertLotterySerialNoList(SSQ.CreateSerialNo(info));
-        }
-        public void CreateDLTSerialNo(LotteryBasicInfo info)
-        {
-            LotteryDLT DLT = new LotteryDLT();
-            InsertLotterySerialNoList(DLT.CreateSerialNo(info));
-        }
-        public void CreateQXCSerialNo(LotteryBasicInfo info)
-        {
-            LotteryQXC QXC = new LotteryQXC();
-            InsertLotterySerialNoList(QXC.CreateSerialNo(info));
-        }
-        public void InsertLotterySerialNoList(List<LotterySerialNo> serials)
-        {
-            using (SQLiteTransaction tran = DBHelper.SQLConn.BeginTransaction())
-            {
-                foreach (var i in serials)
-                {
-                    SQLiteCommand cmd = new SQLiteCommand(DBHelper.SQLConn);
-                    cmd.Transaction = tran;
-                    cmd.CommandText = "insert into LotterySerialNo values(@RowID,@SerialID,@LotteryTypeID,@OpenTime)";
-                    cmd.Parameters.AddRange(new[]{
-                    new SQLiteParameter("@RowID",null),
-                    new SQLiteParameter("@SerialID",i.SerailNo),
-                    new SQLiteParameter("@LotteryTypeID",i.LotteryTypeID),
-                    new SQLiteParameter("@OpenTime",i.OpenTime),
-                    });
-                    cmd.ExecuteNonQuery();
-                }
-                tran.Commit();
-            }
-        }
-        public void InsertLotteryOriginDataList(List<LotteryOriginData> dataList)
-        {
-            using (SQLiteTransaction tran = DBHelper.SQLConn.BeginTransaction())
-            {
-                foreach (var i in dataList)
-                {
-                    SQLiteCommand cmd = new SQLiteCommand(DBHelper.SQLConn);
-                    cmd.Transaction = tran;
-                    cmd.CommandText = "insert into LotteryOriginData values(@RowID,@LotteryTypeID,@OriginData,@DataUrl,@Time,@SerialNo)";
-                    cmd.Parameters.AddRange(new[]{
-                    new SQLiteParameter("@RowID",null),
-                    new SQLiteParameter("@LotteryTypeID",i.LotteryTypeID),
-                    new SQLiteParameter("@OriginData",i.OriginData),
-                    new SQLiteParameter("@DataUrl",i.DataUrl),
-                    new SQLiteParameter("@Time",i.Time),
-                    new SQLiteParameter("@SerialNo",i.SerialNo),
-                    });
-                    cmd.ExecuteNonQuery();
-                }
-                tran.Commit();
-            }
-        }
+        }              
         private void btnCreateSerialNo_Click(object sender, RoutedEventArgs e)
         {
             if (cmbLotteryName.SelectedIndex == -1)
@@ -217,33 +160,9 @@ namespace LotterySpider
             if (info != null)
             {
                 List<LotteryOriginData> dataList = new List<LotteryOriginData>();
-                dataList = LoadLotteryOriginData(info,dataList);
-                switch (info.LotteryShortCode)
-                {
-                    case "SSQ":
-                        LotterySSQ SSQ = new LotterySSQ();
-                        SSQ.AnalyseOriginData(dataList);
-                        break;
-                    default:
-                        break;
-                }
+                dataList = LotteryDataUtils.LoadLotteryOriginData(info,dataList);
+                LotteryDataUtils.ConvertOriginDataToLotteryBaseInfo(dataList);
             }
-        }
-        public List<LotteryOriginData> LoadLotteryOriginData(LotteryBasicInfo info, List<LotteryOriginData> dataList)
-        {
-            SQLiteDataReader Reader = DBHelper.Query("select * from LotteryOriginData where lotterytypeid = " + info.LotteryTypeID);
-            while (Reader.Read())
-            {
-                LotteryOriginData data = new LotteryOriginData() { 
-                RowID = Reader.GetInt32(0),
-                LotteryTypeID = Reader.GetInt32(1),
-                OriginData= Reader.GetString(2),
-                DataUrl = Reader.GetString(3),
-                Time = Reader.GetString(4),
-                };
-                dataList.Add(data);
-            }
-            return dataList;
-        }
+        }        
     }
 }
