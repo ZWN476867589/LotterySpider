@@ -24,21 +24,6 @@ namespace LotterySpider
         {
             InitializeComponent();
         }
-        public void GetSSQInfoByYearAndMonth(DateTime time)
-        {
-            string baseUrl = @"http://baidu.lecai.com/lottery/draw/ajax_get_detail.php?lottery_type=50&phase={0}";
-            HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(baseUrl);
-            request.Method = "GET";
-            request.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8";
-            request.KeepAlive = true;
-            request.UserAgent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101 Safari/537.36";
-            using (WebResponse wr = request.GetResponse())
-            {
-                Stream st = wr.GetResponseStream();
-                StreamReader sr = new StreamReader(st, Encoding.UTF8);
-                string result = sr.ReadToEnd();
-            }
-        }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             LoadLotteryBasicInfo();
@@ -57,7 +42,10 @@ namespace LotterySpider
                     LotteryTypeID = reader.GetInt32(1),
                     LotteryName = reader.GetString(2),
                     LotteryShortCode = reader.GetString(3),
-                    StartSellTime = reader.GetString(5),
+                    StartSaleTime = reader.GetString(5),
+                    StartSerialNo = reader.GetString(6),
+                    SerialNoType = reader.GetString(7),
+                    SerialNoStartIndex = reader.GetInt32(8),
                 };
                 info.SetOpenTimeOfWeek(reader.GetString(4));
                 infos.Add(info);
@@ -100,7 +88,7 @@ namespace LotterySpider
                 {
                     string url = String.Format(baseUrl, num.LotteryTypeID, num.SerailNo);
                     string res = NetHelper.GetByUrl(url);
-                    if (!String.IsNullOrWhiteSpace(res))
+                    if (!String.IsNullOrWhiteSpace(res) && !res.StartsWith("<"))
                     {
                         LotteryOriginData data = new LotteryOriginData()
                         {
@@ -122,20 +110,29 @@ namespace LotterySpider
             LotteryBasicInfo info = infos.FirstOrDefault(p => p.LotteryTypeID.ToString() == LotteryID);
             if (info != null)
             {
-                switch (info.LotteryShortCode)
+                List<LotterySerialNo> serialNos = new List<LotterySerialNo>();
+                DateTime startTime = DateTime.Parse(info.StartSaleTime);
+                int i = info.SerialNoStartIndex;
+                for (DateTime time = startTime; time < DateTime.Now; time = time.AddDays(1))
                 {
-                    case "SSQ":
-                        CreateSSQSerialNo(info);
-                        break;
-                    case "DLT":
-                        CreateDLTSerialNo(info);
-                        break;
-                    case "QXC":
-                        CreateQXCSerialNo(info);
-                        break;
-                    default:
-                        break;
+                    if (time.Year > startTime.Year)
+                    {
+                        startTime = time;
+                        i = 1;
+                    }
+                    if (info.OpenTimeOfWeek.ToList().Contains((int)time.DayOfWeek))
+                    {                        
+                        LotterySerialNo no = new LotterySerialNo()
+                        {
+                            LotteryTypeID = info.LotteryTypeID,
+                            OpenTime = time.ToString(),
+                        };
+                        no.SerailNo = time.Year.ToString().Substring(info.StartSerialNo.Length == 5?2:0,info.StartSerialNo.Length -3) + "" + i.ToString().PadLeft(3, '0');
+                        serialNos.Add(no);
+                        i += 1;
+                    }
                 }
+                InsertLotterySerialNoList(serialNos);
             }
         }
         public void CreateSSQSerialNo(LotteryBasicInfo info)
@@ -204,7 +201,6 @@ namespace LotterySpider
             }
             CreateLotterySerialNo();
         }
-
         private void btnAnalyseData_Click(object sender, RoutedEventArgs e)
         {
             if (cmbLotteryName.SelectedIndex == -1)
