@@ -47,9 +47,29 @@ namespace LotterySpider.DataBase
         }
         public static bool Delete(string sqlStr)
         {
-            SQLiteCommand cmd = new SQLiteCommand(sqlStr,SQLConn);
-            cmd.ExecuteNonQuery();
-            return true;
+            try
+            {
+                SQLiteCommand cmd = new SQLiteCommand(sqlStr, SQLConn);
+                cmd.ExecuteNonQuery();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }            
+        }
+        public static bool Update(string sqlStr)
+        {
+            try
+            {
+                SQLiteCommand cmd = new SQLiteCommand(sqlStr, SQLConn);
+                cmd.ExecuteNonQuery();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            } 
         }
     }
 }
