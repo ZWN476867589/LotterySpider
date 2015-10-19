@@ -7,7 +7,6 @@ namespace LotterySpider.Business
 {
     public interface ILotteryFactory
     {
-        List<LotterySerialNo> CreateSerialNo(LotteryBasicInfo info);
-        //void AnalyseOriginData();
+        List<LotterySerialNo> CreateSerialNo(LotteryBasicInfo info);        
     }
 }
