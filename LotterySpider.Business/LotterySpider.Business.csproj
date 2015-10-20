@@ -54,6 +54,7 @@
     <Compile Include="LotteryDetailInfo.cs" />
     <Compile Include="ILotteryFactory.cs" />
     <Compile Include="LotteryBaseInfo.cs" />
+    <Compile Include="LotteryInfo\LotteryFactory.cs" />
     <Compile Include="UtilTools\EntityHelper.cs" />
     <Compile Include="LotteryInfo\LotteryQXC.cs" />
     <Compile Include="LotteryOriginData.cs" />
