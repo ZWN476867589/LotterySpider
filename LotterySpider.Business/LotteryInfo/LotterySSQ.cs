@@ -153,7 +153,28 @@ namespace LotterySpider.Business.LotteryInfo
         public List<Dictionary<int, int>> GetLotteryDataRandom(List<LotteryBaseInfo> baseInfoList)
         {
             List<Dictionary<int, int>> randomList = new List<Dictionary<int, int>>();
+            Dictionary<int, int> redDict = new Dictionary<int, int>();
+            Dictionary<int, int> blueDict = new Dictionary<int, int>();
+            while (redDict.Count != 6)
+            {
+                int num = LotteryDataUtils.GetRandomInt(DateTime.Now.Millisecond, 33);
+                if (!redDict.Keys.Contains(num) && num > 0)
+                {
+                    redDict.Add(num,num);
+                }
+            }
+            while (blueDict.Count != 1)
+            {
+                int num = LotteryDataUtils.GetRandomInt(DateTime.Now.Millisecond, 16);
+                if (!blueDict.Keys.Contains(num) && num>0)
+                {
+                    blueDict.Add(num, num);
+                }
+            }
+            redDict = redDict.OrderBy(p => p.Key).ToDictionary(p=>p.Key,p=>p.Value);
+            randomList.Add(redDict);
+            randomList.Add(blueDict);
             return randomList;
-        }
+        }        
     }
 }

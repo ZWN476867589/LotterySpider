@@ -86,5 +86,11 @@ namespace LotterySpider.Business.UtilTools
             }
             return BaseInfoList;
         }
+        public static int GetRandomInt(int seed, int maxValue)
+        {
+            Random rand = new Random(seed);
+            int num = rand.Next(maxValue);
+            return num;
+        }
     }
 }

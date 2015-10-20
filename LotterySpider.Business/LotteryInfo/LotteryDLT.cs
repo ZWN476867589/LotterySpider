@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Collections;
+using LotterySpider.Business.UtilTools;
 
 namespace LotterySpider.Business.LotteryInfo
 {
@@ -151,6 +152,27 @@ namespace LotterySpider.Business.LotteryInfo
         public List<Dictionary<int, int>> GetLotteryDataRandom(List<LotteryBaseInfo> baseInfoList)
         {
             List<Dictionary<int, int>> randomList = new List<Dictionary<int, int>>();
+            Dictionary<int, int> redDict = new Dictionary<int, int>();
+            Dictionary<int, int> blueDict = new Dictionary<int, int>();
+            while (redDict.Count != 5)
+            {
+                int num = LotteryDataUtils.GetRandomInt(DateTime.Now.Millisecond, 35);
+                if (!redDict.Keys.Contains(num) && num > 0)
+                {
+                    redDict.Add(num, num);
+                }
+            }
+            while (blueDict.Count != 2)
+            {
+                int num = LotteryDataUtils.GetRandomInt(DateTime.Now.Millisecond, 12);
+                if (!blueDict.Keys.Contains(num) && num > 0)
+                {
+                    blueDict.Add(num, num);
+                }
+            }
+            redDict = redDict.OrderBy(p => p.Key).ToDictionary(p => p.Key, p => p.Value);
+            randomList.Add(redDict);
+            randomList.Add(blueDict);
             return randomList;
         }
     }
