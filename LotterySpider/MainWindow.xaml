@@ -6,17 +6,14 @@
         <ContextMenu DataContext="{Binding}" />
     </Window.ContextMenu>
     <Grid>
-        <TabControl Height="311" HorizontalAlignment="Left" Name="TC1" VerticalAlignment="Top" Width="503">
-            <TabItem Header="彩票信息采集" Name="TISSQ">
-                <Grid>
-                    <Button Content="开始采集" Height="23" HorizontalAlignment="Right" Margin="0,61,300,0" Name="btnStart" VerticalAlignment="Top" Width="75" Click="btnStart_Click" />
-                    <ComboBox Height="23" HorizontalAlignment="Left" Margin="73,10,0,0" Name="cmbLotteryName" VerticalAlignment="Top" Width="120" />
-                    <Label Content="彩票名称:" Height="28" HorizontalAlignment="Left" Margin="6,10,0,0" Name="label1" VerticalAlignment="Top" />
-                    <Button Content="生成序列号" Height="23" HorizontalAlignment="Left" Margin="15,61,0,0" Name="btnCreateSerialNo" VerticalAlignment="Top" Width="75" Click="btnCreateSerialNo_Click" />
-                    <Button Content="分析数据" Height="23" HorizontalAlignment="Left" Margin="214,61,0,0" Name="btnAnalyseData" VerticalAlignment="Top" Width="75" Click="btnAnalyseData_Click" />
-                    <TextBox Height="29" HorizontalAlignment="Left" Margin="15,106,0,0" Name="textBox1" VerticalAlignment="Top" Width="461" />
-                </Grid>
-            </TabItem>
-        </TabControl>
+        <Button Content="开始采集" Height="23" HorizontalAlignment="Right" Margin="0,61,306,0" Name="btnStart" VerticalAlignment="Top" Width="75" Click="btnStart_Click" />
+        <ComboBox Height="23" HorizontalAlignment="Left" Margin="77,10,0,0" Name="cmbLotteryName" VerticalAlignment="Top" Width="120" />
+        <Label Content="彩票名称:" Height="28" HorizontalAlignment="Left" Margin="10,10,0,0" Name="label1" VerticalAlignment="Top" />
+        <Button Content="生成序列号" Height="23" HorizontalAlignment="Left" Margin="19,61,0,0" Name="btnCreateSerialNo" VerticalAlignment="Top" Width="75" Click="btnCreateSerialNo_Click" />
+        <Button Content="分析数据" Height="23" HorizontalAlignment="Right" Margin="0,61,210,0" Name="btnAnalyseData" VerticalAlignment="Top" Width="75" Click="btnAnalyseData_Click" />
+        <TextBox Height="29" HorizontalAlignment="Left" Margin="19,150,0,0" Name="textBox1" VerticalAlignment="Top" Width="461" />
+        <RadioButton Content="出现次数最多" Height="16" HorizontalAlignment="Left" IsChecked="True" Margin="16,116,0,0" Name="rbMaxFrequency" VerticalAlignment="Top" />
+        <RadioButton Content="出现次数最少" Height="16" HorizontalAlignment="Left" Margin="109,116,0,0" Name="rbMinFrequency" VerticalAlignment="Top" />
+        <RadioButton Content="随机" Height="16" HorizontalAlignment="Right" Margin="0,116,245,0" Name="rbRandom" VerticalAlignment="Top" />
     </Grid>
 </Window>

@@ -163,23 +163,33 @@ namespace LotterySpider
                 dataList = LotteryDataUtils.LoadLotteryOriginData(info, dataList);
                 List<LotteryBaseInfo> baseinfoList = LotteryDataUtils.ConvertOriginDataToLotteryBaseInfo(dataList);
                 string content = "";
-                List<Dictionary<int, int>> result = new List<Dictionary<int,int>>();
+                List<Dictionary<int, int>> result = new List<Dictionary<int, int>>();
+                ILotteryFactory Factory = new LotteryFactory();
                 switch (info.LotteryShortCode)
                 {
                     case "SSQ":
-                        LotterySSQ SSQ = new LotterySSQ();
-                        result = SSQ.GetLotteryDataMaxFrequency(baseinfoList);                        
+                        Factory = new LotterySSQ();
                         break;
                     case "DLT":
-                        LotteryDLT DLT = new LotteryDLT();
-                        result = DLT.GetLotteryDataMaxFrequency(baseinfoList);
+                        Factory = new LotteryDLT();
                         break;
                     case "QXC":
-                        LotteryQXC QXC = new LotteryQXC();
-                        result = QXC.GetLotteryDataMaxFrequency(baseinfoList);
+                        Factory = new LotteryQXC();
                         break;
                     default:
                         break;
+                }
+                if (rbMaxFrequency.IsChecked.Value)
+                {
+                    result = Factory.GetLotteryDataMaxFrequency(baseinfoList);
+                }
+                if (rbMinFrequency.IsChecked.Value)
+                {
+                    result = Factory.GetLotteryDataMinFrequency(baseinfoList);
+                }
+                if (rbRandom.IsChecked.Value)
+                {
+                    result = Factory.GetLotteryDataRandom(baseinfoList);
                 }
                 if (result != null)
                 {
@@ -191,7 +201,10 @@ namespace LotterySpider
                         }
                     }
                 }
-                content = content.Substring(0,content.Length-1);
+                if (!String.IsNullOrWhiteSpace(content))
+                {
+                    content = content.Substring(0, content.Length - 1);
+                }
                 textBox1.Text = content;
             }
         }
