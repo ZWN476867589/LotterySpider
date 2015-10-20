@@ -35,6 +35,125 @@ namespace LotterySpider.Business.LotteryInfo
                 }
             }
             return serialNos;
-        }        
+        }
+        public List<Dictionary<int, int>> GetLotteryDataMaxFrequency(List<LotteryBaseInfo> baseInfoList)
+        {
+            List<Dictionary<int, int>> maxList = new List<Dictionary<int, int>>();
+            Dictionary<int, int> maxRedDict = new Dictionary<int, int>();
+            Dictionary<int, int> maxBlueDict = new Dictionary<int, int>();
+            Dictionary<int, int> redDict = new Dictionary<int, int>();
+            Dictionary<int, int> blueDict = new Dictionary<int, int>();
+            if (baseInfoList != null)
+            {
+                foreach (var baseinfo in baseInfoList)
+                {
+                    if (baseinfo.DetailInfo.result != null)
+                    {
+                        ArrayList result = (ArrayList)baseinfo.DetailInfo.result["result"];
+                        foreach (var i in result)
+                        {
+                            Dictionary<string, object> ballDict = (Dictionary<string, object>)i;
+                            string ballColor = ballDict["key"].ToString();
+                            ArrayList ballData = (ArrayList)ballDict["data"];
+                            if (ballColor == "red")
+                            {
+                                foreach (var num in ballData)
+                                {
+                                    if (redDict.Keys.Contains(int.Parse(num.ToString())))
+                                    {
+                                        redDict[int.Parse(num.ToString())] += 1;
+                                    }
+                                    else
+                                    {
+                                        redDict[int.Parse(num.ToString())] = 1;
+                                    }
+                                }
+                            }
+                            if (ballColor == "blue")
+                            {
+                                foreach (var num in ballData)
+                                {
+                                    if (blueDict.Keys.Contains(int.Parse(num.ToString())))
+                                    {
+                                        blueDict[int.Parse(num.ToString())] += 1;
+                                    }
+                                    else
+                                    {
+                                        blueDict[int.Parse(num.ToString())] = 1;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                maxRedDict = redDict.OrderByDescending(p=>p.Value).Take(6).OrderBy(p=>p.Key).ToDictionary(p=>p.Key,p=>p.Value);
+                maxBlueDict = blueDict.OrderByDescending(p => p.Value).Take(1).OrderBy(p => p.Key).ToDictionary(p => p.Key, p => p.Value);
+            }
+            maxList.Add(maxRedDict);
+            maxList.Add(maxBlueDict);
+            return maxList;
+        }
+        public List<Dictionary<int, int>> GetLotteryDataMinFrequency(List<LotteryBaseInfo> baseInfoList)
+        {
+            List<Dictionary<int, int>> minList = new List<Dictionary<int, int>>();
+            Dictionary<int, int> minRedDict = new Dictionary<int, int>();
+            Dictionary<int, int> minBlueDict = new Dictionary<int, int>();
+            Dictionary<int, int> redDict = new Dictionary<int, int>();
+            Dictionary<int, int> blueDict = new Dictionary<int, int>();
+            if (baseInfoList != null)
+            {
+                foreach (var baseinfo in baseInfoList)
+                {
+                    if (baseinfo.DetailInfo.result != null)
+                    {
+                        ArrayList result = (ArrayList)baseinfo.DetailInfo.result["result"];
+                        foreach (var i in result)
+                        {
+                            Dictionary<string, object> ballDict = (Dictionary<string, object>)i;
+                            string ballColor = ballDict["key"].ToString();
+                            ArrayList ballData = (ArrayList)ballDict["data"];
+                            if (ballColor == "red")
+                            {
+                                foreach (var num in ballData)
+                                {
+                                    if (redDict.Keys.Contains(int.Parse(num.ToString())))
+                                    {
+                                        redDict[int.Parse(num.ToString())] += 1;
+                                    }
+                                    else
+                                    {
+                                        redDict[int.Parse(num.ToString())] = 1;
+                                    }
+                                }
+                            }
+                            if (ballColor == "blue")
+                            {
+                                foreach (var num in ballData)
+                                {
+                                    if (blueDict.Keys.Contains(int.Parse(num.ToString())))
+                                    {
+                                        blueDict[int.Parse(num.ToString())] += 1;
+                                    }
+                                    else
+                                    {
+                                        blueDict[int.Parse(num.ToString())] = 1;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                minRedDict = redDict.OrderBy(p => p.Value).Take(6).OrderBy(p => p.Key).ToDictionary(p => p.Key, p => p.Value);
+                minBlueDict = blueDict.OrderBy(p => p.Value).Take(1).OrderBy(p => p.Key).ToDictionary(p => p.Key, p => p.Value);
+            }
+            minList.Add(minRedDict);
+            minList.Add(minBlueDict);
+            return minList;
+        }
+        public List<Dictionary<int, int>> GetLotteryDataRandom(List<LotteryBaseInfo> baseInfoList)
+        {
+            List<Dictionary<int, int>> randomList = new List<Dictionary<int, int>>();
+            return randomList;
+        }
     }
 }

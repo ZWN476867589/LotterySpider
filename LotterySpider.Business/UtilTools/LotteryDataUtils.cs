@@ -86,7 +86,5 @@ namespace LotterySpider.Business.UtilTools
             }
             return BaseInfoList;
         }
-        // string sqlStr = "update LotterySerialNo set OpenTime = '" + BaseInfo.DetailInfo.time_draw + "' where SerialID =" + originData.SerialNo + " and LotteryTypeID =" + originData.LotteryTypeID;
-        //DBHelper.Update(sqlStr); 
     }
 }
