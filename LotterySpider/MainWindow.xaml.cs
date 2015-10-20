@@ -101,7 +101,7 @@ namespace LotterySpider
                         dataList.Add(data);
                     }
                 }
-               LotteryDataUtils.InsertLotteryOriginDataListToDB(dataList);
+                LotteryDataUtils.InsertLotteryOriginDataListToDB(dataList);
             }
         }
         public void CreateLotterySerialNo()
@@ -121,20 +121,20 @@ namespace LotterySpider
                         i = 1;
                     }
                     if (info.OpenTimeOfWeek.ToList().Contains((int)time.DayOfWeek))
-                    {                        
+                    {
                         LotterySerialNo no = new LotterySerialNo()
                         {
                             LotteryTypeID = info.LotteryTypeID,
                             OpenTime = time.ToString(),
                         };
-                        no.SerailNo = time.Year.ToString().Substring(info.StartSerialNo.Length == 5?2:0,info.StartSerialNo.Length -3) + "" + i.ToString().PadLeft(3, '0');
+                        no.SerailNo = time.Year.ToString().Substring(info.StartSerialNo.Length == 5 ? 2 : 0, info.StartSerialNo.Length - 3) + "" + i.ToString().PadLeft(3, '0');
                         serialNos.Add(no);
                         i += 1;
                     }
                 }
                 LotteryDataUtils.InsertLotterySerialNoListToDB(serialNos);
             }
-        }              
+        }
         private void btnCreateSerialNo_Click(object sender, RoutedEventArgs e)
         {
             if (cmbLotteryName.SelectedIndex == -1)
@@ -160,9 +160,40 @@ namespace LotterySpider
             if (info != null)
             {
                 List<LotteryOriginData> dataList = new List<LotteryOriginData>();
-                dataList = LotteryDataUtils.LoadLotteryOriginData(info,dataList);
-                LotteryDataUtils.ConvertOriginDataToLotteryBaseInfo(dataList);
+                dataList = LotteryDataUtils.LoadLotteryOriginData(info, dataList);
+                List<LotteryBaseInfo> baseinfoList = LotteryDataUtils.ConvertOriginDataToLotteryBaseInfo(dataList);
+                string content = "";
+                List<Dictionary<int, int>> result = new List<Dictionary<int,int>>();
+                switch (info.LotteryShortCode)
+                {
+                    case "SSQ":
+                        LotterySSQ SSQ = new LotterySSQ();
+                        result = SSQ.GetLotteryDataMaxFrequency(baseinfoList);                        
+                        break;
+                    case "DLT":
+                        LotteryDLT DLT = new LotteryDLT();
+                        result = DLT.GetLotteryDataMaxFrequency(baseinfoList);
+                        break;
+                    case "QXC":
+                        LotteryQXC QXC = new LotteryQXC();
+                        result = QXC.GetLotteryDataMaxFrequency(baseinfoList);
+                        break;
+                    default:
+                        break;
+                }
+                if (result != null)
+                {
+                    foreach (var i in result)
+                    {
+                        foreach (var j in i.Keys)
+                        {
+                            content += j + " ";
+                        }
+                    }
+                }
+                content = content.Substring(0,content.Length-1);
+                textBox1.Text = content;
             }
-        }        
+        }
     }
 }
